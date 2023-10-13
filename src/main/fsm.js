@@ -99,7 +99,7 @@ function get_editor_content() {
 
 /* NEW FUNCTIONS */
 function check_if_mobile_small() {
-    if (window.innerWidth <= 1600) {
+    if (screen.width <= 1200) {
 
         const styleTag = document.createElement('style');
         styleTag.textContent = "\n" +
