@@ -338,7 +338,7 @@ window.onload = function () {
     panel = document.getElementById('panel');
     canvas.setAttribute("width", `${1200 * screen.width / 2000}px`);
     canvas.setAttribute("height", `${700}px`);
-    panel.setAttribute("width" ,`${400 * screen.width / 2000}px`)
+    panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
     create_json_editor();
     // restoreBackup();
@@ -464,23 +464,23 @@ window.onload = function () {
 let shift = false;
 
 document.onkeydown = function (e) {
-    let key = crossBrowserKey(e);
+    const key = crossBrowserKey(e);
 
-    if (key === 16) {
+    if (key === "Shift") {
         shift = true;
     } else if (!canvasHasFocus()) {
         // don't read keystrokes when other things have focus
         return true;
-    } else if (key === 8) { // backspace key
+    } else if (key === "Backspace") { // backspace key
         if (selectedObject != null && 'text' in selectedObject) {
-            selectedObject.text = selectedObject.text.substr(0, selectedObject.text.length - 1);
+            selectedObject.text = selectedObject.text.substring(0, selectedObject.text.length - 1);
             resetCaret();
             draw();
         }
 
         // backspace is a shortcut for the back button, but do NOT want to change pages
         return false;
-    } else if (key === 46) { // delete key
+    } else if (key === "Backspace" || key === "Delete") { // delete key
         if (selectedObject != null) {
             for (let i = 0; i < nodes.length; i++) {
                 if (nodes[i] === selectedObject) {
@@ -501,7 +501,7 @@ document.onkeydown = function (e) {
 document.onkeyup = function (e) {
     let key = crossBrowserKey(e);
 
-    if (key === 16) {
+    if (key === "Shift") {
         shift = false;
     }
 };
@@ -512,21 +512,21 @@ document.onkeypress = function (e) {
     if (!canvasHasFocus()) {
         // don't read keystrokes when other things have focus
         return true;
-    } else if (key >= 0x20 && key <= 0x7E && !e.metaKey && !e.altKey && !e.ctrlKey && selectedObject != null) {
-        selectedObject.text += String.fromCharCode(key);
+    } else if (!e.metaKey && !e.altKey && !e.ctrlKey && selectedObject != null) {
+        selectedObject.text += e.key
         resetCaret();
         draw();
 
         // don't let keys do their actions (like space scrolls down the page)
         return false;
-    } else if (key === 8) {
+    } else if (key === "Backspace") {
         // backspace is a shortcut for the back button, but do NOT want to change pages
         return false;
     }
 };
 
 function crossBrowserKey(e) {
-    return e.which || e.keyCode;
+    return e.key
 }
 
 function crossBrowserElementPos(e) {
