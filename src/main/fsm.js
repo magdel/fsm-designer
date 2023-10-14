@@ -345,7 +345,6 @@ window.onload = function () {
     // draw();
 
     canvas.onmousedown = function (e) {
-
         const mouse = crossBrowserRelativeMousePos(e);
         in_canvas = true;
 
@@ -453,6 +452,7 @@ window.onload = function () {
             currentLink = null;
             draw();
         }
+        shift = false
     };
 
     panel.onmousedown = function (e) {
@@ -466,7 +466,7 @@ let shift = false;
 document.onkeydown = function (e) {
     const key = crossBrowserKey(e);
 
-    if (key === "Shift") {
+    if (e.shiftKey) {
         shift = true;
     } else if (!canvasHasFocus()) {
         // don't read keystrokes when other things have focus
@@ -476,6 +476,7 @@ document.onkeydown = function (e) {
             selectedObject.text = selectedObject.text.substring(0, selectedObject.text.length - 1);
             resetCaret();
             draw();
+            return true;
         }
 
         // backspace is a shortcut for the back button, but do NOT want to change pages
@@ -494,36 +495,30 @@ document.onkeydown = function (e) {
             }
             selectedObject = null;
             draw();
+            return true;
         }
+    }
+
+    if (!e.metaKey && !e.altKey && !e.ctrlKey && e.key !== "Tab" && selectedObject != null) {
+        if (key === "Shift" && in_canvas) {
+            return true
+        }
+        if (key === " " && in_canvas) {
+            e.preventDefault()
+        }
+        selectedObject.text += e.key
+        resetCaret();
+        draw();
+        return true
     }
 };
 
 document.onkeyup = function (e) {
-    let key = crossBrowserKey(e);
-
-    if (key === "Shift") {
+    if (e.shiftKey) {
         shift = false;
     }
 };
 
-document.onkeypress = function (e) {
-    // don't read keystrokes when other things have focus
-    const key = crossBrowserKey(e);
-    if (!canvasHasFocus()) {
-        // don't read keystrokes when other things have focus
-        return true;
-    } else if (!e.metaKey && !e.altKey && !e.ctrlKey && selectedObject != null) {
-        selectedObject.text += e.key
-        resetCaret();
-        draw();
-
-        // don't let keys do their actions (like space scrolls down the page)
-        return false;
-    } else if (key === "Backspace") {
-        // backspace is a shortcut for the back button, but do NOT want to change pages
-        return false;
-    }
-};
 
 function crossBrowserKey(e) {
     return e.key
