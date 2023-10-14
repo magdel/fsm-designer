@@ -13,7 +13,7 @@ function Node(x, y) {
 
 Node.prototype.getJson = function () {
     if (!this.isAcceptState)
-        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false,}
+        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false}
     else
         return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": true}
 }
@@ -26,8 +26,8 @@ Node.prototype.setJsonModel = function (json) {
     if (json.hasOwnProperty('name')) {
         this.text = json.name
     }
-    if (json.hasOwnProperty('acceptState')) {
-        this.isAcceptState = json.acceptState
+    if (json.hasOwnProperty('isAcceptState')) {
+        this.isAcceptState = json.isAcceptState
     }
 
     this.json_model = json
