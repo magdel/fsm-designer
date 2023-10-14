@@ -1,3 +1,3 @@
 # Finite State Machine Designer
 
-http://madebyevan.com/fsm/
+Checkout the website!
