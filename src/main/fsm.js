@@ -182,6 +182,13 @@ function check_if_mobile_small() {
 window.addEventListener("resize", check_if_mobile_small);
 
 
+function clear_canvas() {
+    nodes.splice(0, nodes.length)
+    links.splice(0, links.length)
+    draw()
+}
+
+
 /*-------------------------------------------------------------*/
 
 
@@ -341,8 +348,8 @@ window.onload = function () {
     panel.setAttribute("width", `${300 * screen.width / 2000}px`)
 
     create_json_editor();
-    // restoreBackup();
-    // draw();
+    restoreBackup();
+    draw();
 
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
