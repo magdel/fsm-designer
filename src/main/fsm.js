@@ -69,7 +69,7 @@ function create_json_editor() {
     }
 
     editor = new JSONEditor(container, options)
-    container.setAttribute("style", `width:${300 * screenRatio}px`)
+    container.setAttribute("style", `width:${400 * screenRatio}px`)
 
     // set json
     const initialJson = {
@@ -374,7 +374,7 @@ window.onload = function () {
     panel = document.getElementById('panel');
     canvas.setAttribute("width", `${1200 * screen.width / 2000}px`);
     canvas.setAttribute("height", `${700}px`);
-    panel.setAttribute("width", `${300 * screen.width / 2000}px`)
+    panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
     create_json_editor();
     restoreBackup();
