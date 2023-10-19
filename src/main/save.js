@@ -4,28 +4,32 @@ function restoreBackup() {
     }
 
     try {
-        var backup = JSON.parse(localStorage['fsm']);
+        const backup = JSON.parse(localStorage['fsm']);
 
-        for (var i = 0; i < backup.nodes.length; i++) {
-            var backupNode = backup.nodes[i];
-            var node = new Node(backupNode.x, backupNode.y);
+        for (let i = 0; i < backup.nodes.length; i++) {
+            const backupNode = backup.nodes[i];
+            const node = new Node(backupNode.x, backupNode.y);
             node.isAcceptState = backupNode.isAcceptState;
             node.text = backupNode.text;
+            node.radius = backupNode.radius;
+            node.json_model = JSON.parse(backupNode.json_model)
+            node.fontSize = backupNode.fontSize
             nodes.push(node);
         }
-        for (var i = 0; i < backup.links.length; i++) {
-            var backupLink = backup.links[i];
-            var link = null;
-            if (backupLink.type == 'SelfLink') {
+
+        for (let i = 0; i < backup.links.length; i++) {
+            const backupLink = backup.links[i];
+            let link = null;
+            if (backupLink.type === 'SelfLink') {
                 link = new SelfLink(nodes[backupLink.node]);
                 link.anchorAngle = backupLink.anchorAngle;
                 link.text = backupLink.text;
-            } else if (backupLink.type == 'StartLink') {
+            } else if (backupLink.type === 'StartLink') {
                 link = new StartLink(nodes[backupLink.node]);
                 link.deltaX = backupLink.deltaX;
                 link.deltaY = backupLink.deltaY;
                 link.text = backupLink.text;
-            } else if (backupLink.type == 'Link') {
+            } else if (backupLink.type === 'Link') {
                 link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
                 link.parallelPart = backupLink.parallelPart;
                 link.perpendicularPart = backupLink.perpendicularPart;
@@ -46,23 +50,26 @@ function saveBackup() {
         return;
     }
 
-    var backup = {
+    const backup = {
         'nodes': [],
         'links': [],
     };
-    for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        var backupNode = {
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const backupNode = {
             'x': node.x,
             'y': node.y,
+            'radius': node.radius,
             'text': node.text,
             'isAcceptState': node.isAcceptState,
+            'json_model': JSON.stringify(node.json_model),
+            'fontSize': node.fontSize
         };
         backup.nodes.push(backupNode);
     }
-    for (var i = 0; i < links.length; i++) {
-        var link = links[i];
-        var backupLink = null;
+    for (let i = 0; i < links.length; i++) {
+        const link = links[i];
+        let backupLink = null;
         if (link instanceof SelfLink) {
             backupLink = {
                 'type': 'SelfLink',

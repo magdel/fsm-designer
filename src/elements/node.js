@@ -6,16 +6,29 @@ function Node(x, y) {
     this.isAcceptState = false;
     this.text = '';
     this.outputs = {}
+    this.radius = nodeRadius
+    this.fontSize = fontSize
 
     this.json_model = {};
 
 }
 
 Node.prototype.getJson = function () {
-    if (!this.isAcceptState)
-        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false}
-    else
-        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": true}
+
+
+    if (!this.isAcceptState) {
+        if (this.json_model["outputs"]) {
+            return {...this.json_model, "name": this.text, "isAcceptState": false}
+        } else {
+            return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false}
+        }
+    } else {
+        if (this.json_model["outputs"]) {
+            return {...this.json_model, "name": this.text, "isAcceptState": true}
+        } else {
+            return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": true}
+        }
+    }
 }
 
 
@@ -47,30 +60,30 @@ Node.prototype.setAnchorPoint = function (x, y) {
 Node.prototype.draw = function (c, mode) {
     // draw the circle
     c.beginPath();
-    c.arc(this.x, this.y, nodeRadius, 0, 2 * Math.PI, false);
+    c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
     stroke_theme_based(c, mode)
 
     // draw the text
-    drawText(c, this.text, this.x, this.y, null, selectedObject === this);
+    drawText(c, this.text, this.x, this.y, null, this.fontSize, false, selectedObject === this);
 
     // draw a double circle for an accept state
     if (this.isAcceptState) {
         c.beginPath();
-        c.arc(this.x, this.y, nodeRadius - 6, 0, 2 * Math.PI, false);
+        c.arc(this.x, this.y, this.radius - 6, 0, 2 * Math.PI, false);
         stroke_theme_based(c, mode)
     }
 };
 
 Node.prototype.closestPointOnCircle = function (x, y) {
-    var dx = x - this.x;
-    var dy = y - this.y;
-    var scale = Math.sqrt(dx * dx + dy * dy);
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const scale = Math.sqrt(dx * dx + dy * dy);
     return {
-        'x': this.x + dx * nodeRadius / scale,
-        'y': this.y + dy * nodeRadius / scale,
+        'x': this.x + dx * this.radius / scale,
+        'y': this.y + dy * this.radius / scale,
     };
 };
 
 Node.prototype.containsPoint = function (x, y) {
-    return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < nodeRadius * nodeRadius;
+    return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < this.radius * this.radius;
 };

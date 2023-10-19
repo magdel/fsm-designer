@@ -8,6 +8,7 @@ function Link(a, b) {
     this.parallelPart = 0.5; // percentage from nodeA to nodeB
     this.perpendicularPart = 0; // pixels from line between nodeA and nodeB
 
+    this.fontSize = fontSize;
     this.json_model = {};
 }
 
@@ -72,8 +73,8 @@ Link.prototype.getEndPointsAndCircle = function () {
     const circle = circleFromThreePoints(this.nodeA.x, this.nodeA.y, this.nodeB.x, this.nodeB.y, anchor.x, anchor.y);
     const isReversed = (this.perpendicularPart > 0);
     const reverseScale = isReversed ? 1 : -1;
-    const startAngle = Math.atan2(this.nodeA.y - circle.y, this.nodeA.x - circle.x) - reverseScale * nodeRadius / circle.radius;
-    const endAngle = Math.atan2(this.nodeB.y - circle.y, this.nodeB.x - circle.x) + reverseScale * nodeRadius / circle.radius;
+    const startAngle = Math.atan2(this.nodeA.y - circle.y, this.nodeA.x - circle.x) - reverseScale * this.nodeA.radius / circle.radius;
+    const endAngle = Math.atan2(this.nodeB.y - circle.y, this.nodeB.x - circle.x) + reverseScale * this.nodeB.radius / circle.radius;
     const startX = circle.x + circle.radius * Math.cos(startAngle);
     const startY = circle.y + circle.radius * Math.sin(startAngle);
     const endX = circle.x + circle.radius * Math.cos(endAngle);
@@ -124,12 +125,12 @@ Link.prototype.draw = function (c, color) {
         const textAngle = (startAngle + endAngle) / 2 + stuff.isReversed * Math.PI;
         const textX = stuff.circleX + stuff.circleRadius * Math.cos(textAngle);
         const textY = stuff.circleY + stuff.circleRadius * Math.sin(textAngle);
-        drawText(c, this.text, textX, textY, textAngle, selectedObject == this);
+        drawText(c, this.text, textX, textY, textAngle, this.fontSize, true, selectedObject === this);
     } else {
         const textX = (stuff.startX + stuff.endX) / 2;
         const textY = (stuff.startY + stuff.endY) / 2;
         const textAngle = Math.atan2(stuff.endX - stuff.startX, stuff.startY - stuff.endY);
-        drawText(c, this.text, textX, textY, textAngle + this.lineAngleAdjust, selectedObject == this);
+        drawText(c, this.text, textX, textY, textAngle + this.lineAngleAdjust, this.fontSize, true, selectedObject === this);
     }
 };
 

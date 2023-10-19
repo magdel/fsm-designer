@@ -176,7 +176,6 @@ function check_if_mobile_small() {
         }
         return false
     }
-    return false
 }
 
 window.addEventListener("resize", check_if_mobile_small);
@@ -239,19 +238,28 @@ function canvasHasFocus() {
     return in_canvas;
 }
 
-function drawText(c, originalText, x, y, angleOrNull, isSelected) {
-    let text = convertLatexShortcuts(originalText);
-    c.font = '20px "Times New Roman", serif';
-    let width = c.measureText(text).width;
+function drawText(c, originalText, x, y, angleOrNull, fontSize, isLink, isSelected) {
+    c.font = `${fontSize}px "Times New Roman", serif`;
+
+
+    let lines = originalText.split("\n")
+    let max_width = 0
+    for (let i = 0; i < lines.length; i++) {
+        lines[i] = convertLatexShortcuts(lines[i])
+        let width = c.measureText(lines[i]).width
+        if (width > max_width) max_width = width
+    }
 
     // center the text
-    x -= width / 2;
+    let x_c = x
+    x -= max_width / 2;
+
 
     // position the text intelligently if given an angle
     if (angleOrNull != null) {
         let cos = Math.cos(angleOrNull);
         let sin = Math.sin(angleOrNull);
-        let cornerPointX = (width / 2 + 5) * (cos > 0 ? 1 : -1);
+        let cornerPointX = (max_width / 2 + 5) * (cos > 0 ? 1 : -1);
         let cornerPointY = (10 + 5) * (sin > 0 ? 1 : -1);
         let slide = sin * Math.pow(Math.abs(sin), 40) * cornerPointX - cos * Math.pow(Math.abs(cos), 10) * cornerPointY;
         x += cornerPointX - sin * slide;
@@ -260,17 +268,37 @@ function drawText(c, originalText, x, y, angleOrNull, isSelected) {
 
     // draw text and caret (round the coordinates so the caret falls on a pixel)
     if ('advancedFillText' in c) {
-        c.advancedFillText(text, originalText, x + width / 2, y, angleOrNull);
+        c.advancedFillText(convertLatexShortcuts(originalText), originalText, x + max_width / 2, y, angleOrNull);
     } else {
-        x = Math.round(x);
-        y = Math.round(y);
-        c.fillText(text, x, y + 6);
+        if (isLink) {
+            x = Math.round(x);
+            y = Math.round(y);
+            c.fillText(convertLatexShortcuts(originalText), x, y + 6);
+        } else {
+            y = Math.round(y) - (lines.length - 1) * fontSize / 2;
+            let dx
+            for (let i = 0; i < lines.length; i++) {
+                dx = Math.round(c.measureText(lines[i]).width);
+                c.fillText(lines[i], x_c - dx / 2, y + 6 + i * fontSize)
+            }
+        }
+
+
         if (isSelected && caretVisible && canvasHasFocus() && document.hasFocus()) {
-            x += width;
-            c.beginPath();
-            c.moveTo(x, y - 10);
-            c.lineTo(x, y + 10);
-            c.stroke();
+            if (isLink) {
+                x += max_width;
+                c.beginPath();
+                c.moveTo(x, y - fontSize / 2);
+                c.lineTo(x, y + fontSize / 2);
+                c.stroke();
+            } else {
+                x += max_width / 2
+                x += c.measureText(lines[lines.length - 1]).width / 2
+                c.beginPath();
+                c.moveTo(x, y + (fontSize * (lines.length - 1)) + fontSize / 2);
+                c.lineTo(x, y + (fontSize * (lines.length - 1)) - fontSize / 2);
+                c.stroke();
+            }
         }
     }
 }
@@ -288,6 +316,7 @@ let theme = "light"
 let canvas;
 let panel;
 let nodeRadius = 45;
+let fontSize = 20;
 let nodes = [];
 let links = [];
 let snapToPadding = 6; // pixels
@@ -351,6 +380,8 @@ window.onload = function () {
     restoreBackup();
     draw();
 
+    console.log(nodes)
+
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
         in_canvas = true;
@@ -413,6 +444,7 @@ window.onload = function () {
 
     canvas.onmousemove = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
+
 
         if (currentLink != null) {
             let targetNode = selectObject(mouse.x, mouse.y);
@@ -506,8 +538,38 @@ document.onkeydown = function (e) {
         }
     }
 
+    if (shift && key.includes("Arrow") && selectedObject) {
+        if (key === "ArrowUp") {
+            e.preventDefault()
+            selectedObject.radius += 2.5
+        }
+        if (key === "ArrowDown") {
+            e.preventDefault()
+            selectedObject.radius -= 2
+            selectedObject.radius = Math.max(selectedObject.radius, 0)
+        }
+        if (key === "ArrowRight") {
+            e.preventDefault()
+            selectedObject.fontSize += 2.5
+        }
+        if (key === "ArrowLeft") {
+            e.preventDefault()
+            selectedObject.fontSize -= 2
+            selectedObject.fontSize = Math.max(selectedObject.fontSize, 0)
+        }
+
+        return true
+    }
+
     if (!e.metaKey && !e.altKey && !e.ctrlKey && e.key !== "Tab" && selectedObject != null) {
         if (key === "Shift" && in_canvas) {
+            return true
+        }
+
+        if (key === "Enter" && in_canvas) {
+            selectedObject.text += "\n"
+            resetCaret()
+            draw()
             return true
         }
         if (key === " " && in_canvas) {
@@ -635,7 +697,7 @@ async function copyToClipboard(textToCopy) {
             const textArea = document.createElement("textarea");
             textArea.value = textToCopy;
 
-            // Move textarea out of the viewport so it's not visible
+            // Move textarea out of the viewport, so it's not visible
             textArea.style.position = "absolute";
             textArea.style.left = "-999999px";
 

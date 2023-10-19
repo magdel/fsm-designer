@@ -3,6 +3,7 @@ function SelfLink(node, mouse) {
     this.anchorAngle = 0;
     this.mouseOffsetAngle = 0;
     this.text = '';
+    this.fontSize = fontSize
 
 
     if (mouse) {
@@ -25,9 +26,9 @@ SelfLink.prototype.setAnchorPoint = function (x, y) {
 };
 
 SelfLink.prototype.getEndPointsAndCircle = function () {
-    var circleX = this.node.x + 1.5 * nodeRadius * Math.cos(this.anchorAngle);
-    var circleY = this.node.y + 1.5 * nodeRadius * Math.sin(this.anchorAngle);
-    var circleRadius = 0.75 * nodeRadius;
+    var circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
+    var circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
+    var circleRadius = 0.75 * this.node.radius;
     var startAngle = this.anchorAngle - Math.PI * 0.8;
     var endAngle = this.anchorAngle + Math.PI * 0.8;
     var startX = circleX + circleRadius * Math.cos(startAngle);
@@ -48,17 +49,17 @@ SelfLink.prototype.getEndPointsAndCircle = function () {
     };
 };
 
-SelfLink.prototype.draw = function (c) {
-    var stuff = this.getEndPointsAndCircle();
+SelfLink.prototype.draw = function (c, mode) {
+    const stuff = this.getEndPointsAndCircle();
     // draw arc
     c.beginPath();
     c.arc(stuff.circleX, stuff.circleY, stuff.circleRadius, stuff.startAngle, stuff.endAngle, false);
-    stroke_theme_based(c)
+    stroke_theme_based(c, mode)
 
     // draw the text on the loop farthest from the node
-    var textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
-    var textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
-    drawText(c, this.text, textX, textY, this.anchorAngle, selectedObject == this);
+    const textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
+    const textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
+    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize,true,  selectedObject === this);
     // draw the head of the arrow
     drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
 };
