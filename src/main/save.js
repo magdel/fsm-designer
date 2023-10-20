@@ -154,6 +154,7 @@ function restore(obj) {
                         link.json_model = JSON.parse(backupLink.json_model)
                     else
                         backupLink.json_model = {}
+
                 } else if (backupLink.type === 'StartLink') {
                     link = new StartLink(nodes[backupLink.node]);
                     link.deltaX = backupLink.deltaX ?? 0;
@@ -167,11 +168,14 @@ function restore(obj) {
                         link.json_model = JSON.parse(backupLink.json_model)
                     else
                         backupLink.json_model = {}
+
                 }
 
                 if (link != null) {
+                    console.log(backupLink)
                     link.linkId = backupLink.linkId
                     link.text = backupLink.text ?? "";
+                    link.fontSize = backupLink.fontSize
                     links.push(link);
                 }
 
@@ -216,6 +220,7 @@ function saveBackup() {
                 'anchorAngle': link.anchorAngle,
                 'json_model': JSON.stringify(link.json_model),
                 'linkId': link.linkId,
+                'fontSize': link.fontSize,
             };
         } else if (link instanceof StartLink) {
             backupLink = {
@@ -232,6 +237,7 @@ function saveBackup() {
                 'nodeA': nodes.indexOf(link.nodeA),
                 'nodeB': nodes.indexOf(link.nodeB),
                 'json_model': JSON.stringify(link.json_model),
+                'fontSize': link.fontSize,
                 'text': link.text,
                 'lineAngleAdjust': link.lineAngleAdjust,
                 'parallelPart': link.parallelPart,
