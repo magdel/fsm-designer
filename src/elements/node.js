@@ -8,6 +8,7 @@ function Node(x, y) {
     this.outputs = {}
     this.radius = nodeRadius
     this.fontSize = fontSize
+    this.nodeId = null
 
     this.json_model = {};
 

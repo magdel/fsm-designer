@@ -188,6 +188,64 @@ function clear_canvas() {
 }
 
 
+// Add a click event listener to the card
+function init_uploader() {
+
+    // Get a reference to the card element with file input
+    const card = document.getElementById("json-container");
+
+// Get a reference to the hidden input element
+    const jsonUpload = document.getElementById("json-upload");
+
+    card.onclick = () => {
+        jsonUpload.click();
+    }
+
+    jsonUpload.onchange = () => {
+
+        const file = jsonUpload.files[0];
+        if (file) {
+            if (file.size > 10485760) {
+                failedToast("Input file is too large 😱")
+                return
+            }
+            // Check if the file name ends with ".json"
+            if (file.name.endsWith(".json")) {
+
+                // Read the file content as text
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const fileContent = event.target.result;
+
+                    // Parse the JSON content
+                    try {
+                        const jsonObject = JSON.parse(fileContent);
+                        restore(jsonObject)
+                        console.log(nodes)
+                        console.log(links)
+                        draw()
+                    } catch (error) {
+                        failedToast("Error parsing JSON :");
+                    }
+                };
+                reader.readAsText(file);
+
+
+            } else {
+                // It's not a JSON file, log an error
+                failedToast("Only Json file is supported 😬")
+            }
+            jsonUpload.value = null;
+        }
+    }
+}
+
+const uniqueId = () => {
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
+};
+
 /*-------------------------------------------------------------*/
 
 
@@ -328,8 +386,6 @@ let originalClick;
 const screenRatio = screen.width / 2000
 
 function draw() {
-
-
     if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link))
         set_editor_content(selectedObject.getJson())
 
@@ -377,10 +433,9 @@ window.onload = function () {
     panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
     create_json_editor();
-    restoreBackup();
+    restore();
     draw();
-
-    console.log(nodes)
+    init_uploader()
 
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
@@ -432,6 +487,7 @@ window.onload = function () {
 
         if (selectedObject == null) {
             selectedObject = new Node(mouse.x, mouse.y);
+            selectedObject.nodeId = uniqueId()
             nodes.push(selectedObject);
             resetCaret();
             draw();
@@ -485,6 +541,7 @@ window.onload = function () {
         if (currentLink != null) {
             if (!(currentLink instanceof TemporaryLink)) {
                 selectedObject = currentLink;
+                currentLink.linkId = uniqueId()
                 links.push(currentLink);
                 resetCaret();
             }
@@ -634,7 +691,7 @@ function saveAsPNG() {
         navigator.clipboard.write([new ClipboardItem({'image/png': blob})])
     })
 
-    successToast()
+    successToast("Copied to clipboard  \t\t🤪")
 }
 
 function saveAsSVG() {
@@ -664,9 +721,9 @@ function saveAsJson() {
 }
 
 
-function successToast() {
+function successToast(msg) {
     Toastify({
-        text: "Copied to clipboard  \t\t🤪",
+        text: msg,
         classname: "info",
         duration: 3000,
         offset: 50,
@@ -676,7 +733,28 @@ function successToast() {
         style: {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
             height: "45px",
-            width: "240px"
+            width: "300px"
+        },
+        onClick: function () {
+        } // Callback after click
+    }).showToast();
+}
+
+
+function failedToast(msg) {
+    Toastify({
+        text: msg,
+        classname: "info",
+        duration: 3000,
+        offset: 50,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+            background: "rgb(101,54,46)",
+            background: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
+            height: "45px",
+            width: "300px"
         },
         onClick: function () {
         } // Callback after click
@@ -690,7 +768,7 @@ async function copyToClipboard(textToCopy) {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(textToCopy);
-            successToast()
+            successToast("Copied to clipboard  \t\t🤪")
 
         } else {
             // Use the 'out of viewport hidden text area' trick

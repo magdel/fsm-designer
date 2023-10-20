@@ -2,6 +2,7 @@ function Link(a, b) {
     this.nodeA = a;
     this.nodeB = b;
     this.text = '';
+    this.linkId = null
     this.lineAngleAdjust = 0; // value to add to textAngle when link is straight line
 
     // make anchor point relative to the locations of nodeA and nodeB

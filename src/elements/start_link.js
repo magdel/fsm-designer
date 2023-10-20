@@ -3,6 +3,7 @@ function StartLink(node, start) {
     this.deltaX = 0;
     this.deltaY = 0;
     this.text = '';
+    this.linkId = null
     this.fontSize = fontSize
 
     this.outputs = {};
