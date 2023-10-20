@@ -221,11 +221,10 @@ function init_uploader() {
                     try {
                         const jsonObject = JSON.parse(fileContent);
                         restore(jsonObject)
-                        console.log(nodes)
-                        console.log(links)
                         draw()
+                        successToast("Draw successfully 🤩")
                     } catch (error) {
-                        failedToast("Error parsing JSON :");
+                        failedToast("Error parsing the JSON 😥");
                     }
                 };
                 reader.readAsText(file);
@@ -386,8 +385,9 @@ let originalClick;
 const screenRatio = screen.width / 2000
 
 function draw() {
-    if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link))
+    if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link || selectedObject instanceof SelfLink)) {
         set_editor_content(selectedObject.getJson())
+    }
 
 
     drawUsing(canvas.getContext('2d'));
@@ -443,7 +443,7 @@ window.onload = function () {
 
         // if selectedObject is not null than save the json of the editor into the node
         const json = get_editor_content()
-        if (selectedObject != null && selectedObject instanceof Node) {
+        if (selectedObject != null && (selectedObject instanceof Node || selectedObject instanceof Link || selectedObject instanceof SelfLink)) {
             selectedObject.setJsonModel(json)
         }
 
@@ -691,7 +691,7 @@ function saveAsPNG() {
         navigator.clipboard.write([new ClipboardItem({'image/png': blob})])
     })
 
-    successToast("Copied to clipboard  \t\t🤪")
+    successToast("Copied to clipboard  \t\t😊")
 }
 
 function saveAsSVG() {
@@ -768,7 +768,7 @@ async function copyToClipboard(textToCopy) {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(textToCopy);
-            successToast("Copied to clipboard  \t\t🤪")
+            successToast("Copied to clipboard  \t\t😊")
 
         } else {
             // Use the 'out of viewport hidden text area' trick

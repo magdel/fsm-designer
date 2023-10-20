@@ -13,10 +13,22 @@ function json_base_construct(obj) {
                 const node = new Node(drawProp.x, drawProp.y)
                 node.isAcceptState = storedNode.isAcceptState
                 node.text = storedNode.name
+                node.outputs = storedNode.outputs
                 node.nodeId = storedNode.node_id
 
                 node.radius = drawProp.radius
                 node.fontSize = drawProp.fontSize
+
+
+                // extract all the other fields as json_model
+                const json_model = {}
+                for (const property in storedNode) {
+                    if (storedNode.hasOwnProperty(property) && !node.hasOwnProperty(property) && property !== "draw_prop" && property !== "node_id") {
+                        json_model[property] = storedNode[property]
+                    }
+                }
+
+                node.json_model = json_model
                 nodes.push(node)
             }
 
@@ -60,8 +72,6 @@ function json_base_construct(obj) {
                         }
                     }
 
-                    console.log(linkNodeB)
-
 
                     link = new Link(linkNodeA, linkNodeB);
                     link.parallelPart = drawProp.parallelPart
@@ -71,9 +81,22 @@ function json_base_construct(obj) {
 
                 if (link != null) {
                     link.fontSize = drawProp.fontSize
-
                     link.linkId = storedLink.link_id
                     link.text = storedLink.name;
+
+                    // extract all the other fields as json_model
+                    const json_model = {}
+                    for (const property in storedLink) {
+                        if (storedLink.hasOwnProperty(property) && !link.hasOwnProperty(property)
+                            && property !== "draw_prop" && property !== "link_id"
+                            && property !== "source" && property !== "source_id"
+                            && property !== "dest" && property !== "dest_id"
+
+                        ) {
+                            json_model[property] = storedLink[property]
+                        }
+                    }
+                    link.json_model = json_model
                     links.push(link);
                 }
 
@@ -83,8 +106,6 @@ function json_base_construct(obj) {
         } catch (e) {
             console.log(e)
         }
-
-        console.log(links)
     }
 
 
@@ -99,7 +120,7 @@ function restore(obj) {
     }
 
 
-    if ((!localStorage || !JSON)) {
+    if ((!localStorage || !JSON || !localStorage['fsm'])) {
         return;
     }
 
@@ -129,6 +150,10 @@ function restore(obj) {
                 if (backupLink.type === 'SelfLink') {
                     link = new SelfLink(nodes[backupLink.node]);
                     link.anchorAngle = backupLink.anchorAngle;
+                    if (backupLink.json_model)
+                        link.json_model = JSON.parse(backupLink.json_model)
+                    else
+                        backupLink.json_model = {}
                 } else if (backupLink.type === 'StartLink') {
                     link = new StartLink(nodes[backupLink.node]);
                     link.deltaX = backupLink.deltaX ?? 0;
@@ -138,6 +163,10 @@ function restore(obj) {
                     link.parallelPart = backupLink.parallelPart ?? 0.5;
                     link.perpendicularPart = backupLink.perpendicularPart ?? 0;
                     link.lineAngleAdjust = backupLink.lineAngleAdjust ?? 0;
+                    if (backupLink.json_model)
+                        link.json_model = JSON.parse(backupLink.json_model)
+                    else
+                        backupLink.json_model = {}
                 }
 
                 if (link != null) {
@@ -185,6 +214,7 @@ function saveBackup() {
                 'node': nodes.indexOf(link.node),
                 'text': link.text,
                 'anchorAngle': link.anchorAngle,
+                'json_model': JSON.stringify(link.json_model),
                 'linkId': link.linkId,
             };
         } else if (link instanceof StartLink) {
@@ -201,6 +231,7 @@ function saveBackup() {
                 'type': 'Link',
                 'nodeA': nodes.indexOf(link.nodeA),
                 'nodeB': nodes.indexOf(link.nodeB),
+                'json_model': JSON.stringify(link.json_model),
                 'text': link.text,
                 'lineAngleAdjust': link.lineAngleAdjust,
                 'parallelPart': link.parallelPart,

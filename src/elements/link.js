@@ -13,10 +13,6 @@ function Link(a, b) {
     this.json_model = {};
 }
 
-Link.prototype.getJson = function () {
-    // return json obj based on this.txt and this.output
-    return {...this.json_model, "name": this.text}
-}
 
 Link.prototype.setJsonModel = function (json) {
     if (json.hasOwnProperty('name')) {
@@ -24,6 +20,11 @@ Link.prototype.setJsonModel = function (json) {
     }
 
     this.json_model = json
+}
+
+Link.prototype.getJson = function () {
+    // return json obj based on this.txt and this.output
+    return {...this.json_model, "name": this.text}
 }
 
 

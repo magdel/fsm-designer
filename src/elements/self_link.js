@@ -5,11 +5,26 @@ function SelfLink(node, mouse) {
     this.text = '';
     this.linkId = null
     this.fontSize = fontSize
+    this.json_model = {}
 
 
     if (mouse) {
         this.setAnchorPoint(mouse.x, mouse.y);
     }
+}
+
+
+SelfLink.prototype.setJsonModel = function (json) {
+    if (json.hasOwnProperty('name')) {
+        this.text = json.name
+    }
+
+    this.json_model = json
+}
+
+SelfLink.prototype.getJson = function () {
+    // return json obj based on this.txt and this.output
+    return {...this.json_model, "name": this.text}
 }
 
 SelfLink.prototype.setMouseStart = function (x, y) {
@@ -19,7 +34,7 @@ SelfLink.prototype.setMouseStart = function (x, y) {
 SelfLink.prototype.setAnchorPoint = function (x, y) {
     this.anchorAngle = Math.atan2(y - this.node.y, x - this.node.x) + this.mouseOffsetAngle;
     // snap to 90 degrees
-    var snap = Math.round(this.anchorAngle / (Math.PI / 2)) * (Math.PI / 2);
+    const snap = Math.round(this.anchorAngle / (Math.PI / 2)) * (Math.PI / 2);
     if (Math.abs(this.anchorAngle - snap) < 0.1) this.anchorAngle = snap;
     // keep in the range -pi to pi so our containsPoint() function always works
     if (this.anchorAngle < -Math.PI) this.anchorAngle += 2 * Math.PI;
@@ -27,15 +42,15 @@ SelfLink.prototype.setAnchorPoint = function (x, y) {
 };
 
 SelfLink.prototype.getEndPointsAndCircle = function () {
-    var circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
-    var circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
-    var circleRadius = 0.75 * this.node.radius;
-    var startAngle = this.anchorAngle - Math.PI * 0.8;
-    var endAngle = this.anchorAngle + Math.PI * 0.8;
-    var startX = circleX + circleRadius * Math.cos(startAngle);
-    var startY = circleY + circleRadius * Math.sin(startAngle);
-    var endX = circleX + circleRadius * Math.cos(endAngle);
-    var endY = circleY + circleRadius * Math.sin(endAngle);
+    const circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
+    const circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
+    const circleRadius = 0.75 * this.node.radius;
+    const startAngle = this.anchorAngle - Math.PI * 0.8;
+    const endAngle = this.anchorAngle + Math.PI * 0.8;
+    const startX = circleX + circleRadius * Math.cos(startAngle);
+    const startY = circleY + circleRadius * Math.sin(startAngle);
+    const endX = circleX + circleRadius * Math.cos(endAngle);
+    const endY = circleY + circleRadius * Math.sin(endAngle);
     return {
         'hasCircle': true,
         'startX': startX,
@@ -60,15 +75,15 @@ SelfLink.prototype.draw = function (c, mode) {
     // draw the text on the loop farthest from the node
     const textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
     const textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
-    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize,true,  selectedObject === this);
+    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize, true, selectedObject === this);
     // draw the head of the arrow
     drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
 };
 
 SelfLink.prototype.containsPoint = function (x, y) {
-    var stuff = this.getEndPointsAndCircle();
-    var dx = x - stuff.circleX;
-    var dy = y - stuff.circleY;
-    var distance = Math.sqrt(dx * dx + dy * dy) - stuff.circleRadius;
+    const stuff = this.getEndPointsAndCircle();
+    const dx = x - stuff.circleX;
+    const dy = y - stuff.circleY;
+    const distance = Math.sqrt(dx * dx + dy * dy) - stuff.circleRadius;
     return (Math.abs(distance) < hitTargetPadding);
 };
