@@ -618,6 +618,10 @@ document.onkeydown = function (e) {
         return true
     }
 
+    if (shift && key == "L"){
+        clear_canvas()
+    }
+
     if (!e.metaKey && !e.altKey && !e.ctrlKey && e.key !== "Tab" && selectedObject != null) {
         if (key === "Shift" && in_canvas) {
             return true
