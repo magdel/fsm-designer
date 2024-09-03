@@ -739,6 +739,16 @@ function saveAsLaTeX() {
     copyToClipboard(texData);
 }
 
+function saveAsJava() {
+    let exporter = new ExportAsJava();
+    let oldSelectedObject = selectedObject;
+    selectedObject = null;
+    drawUsing(exporter);
+    selectedObject = oldSelectedObject;
+    let texData = exporter.toJava();
+    copyToClipboard(texData);
+}
+
 function saveAsJson() {
     return copyToClipboard(ExportAsJson())
 }
