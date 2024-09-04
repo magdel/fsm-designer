@@ -118,6 +118,34 @@ function ExportAsJava() {
                     '          return StageActionResult.success(ProcessContextModifier.UpdateContext.YES);\n' +
                     '}\n' +
                     '}\n\n';
+            } else
+            if (nodeOutLinks.get(node.nodeId).length >= 1) {
+                var link = nodeOutLinks.get(node.nodeId)[0];
+                var fromNode = getNodeById(link.nodeA.nodeId);
+                fsmBuild = fsmBuild + '.stage(State.STATE_' + fromNode.text + ', ' +
+                    'new ' + fromNode.text + 'Action())\n';
+                var outLinks = nodeOutLinks.get(node.nodeId);
+
+                var fsmResult = ' enum ' + fromNode.text + 'Result {\n';
+                for (let j = 0; j < outLinks.length; j++) {
+                    var outLink = outLinks[j];
+                    var fromNode = getNodeById(outLink.nodeA.nodeId);
+                    var toNode = getNodeById(outLink.nodeB.nodeId);
+                    fsmBuild = fsmBuild +
+                        '.when(' + fromNode.text + 'Result.RESULT_' + j + ').thenNextStage(State.STATE_' + toNode.text + ')\n';
+                    fsmResult = fsmResult + ' RESULT_' + j+ ', ';
+                }
+                fsmBuild = fsmBuild +
+                    '.endConditions()\n';
+                fsmResult = fsmResult + "\n}\n";
+
+                fsmActions = fsmActions + fsmResult +
+                    '    static class '+fromNode.text+'Action implements StageAction<GeneratedProcess, ' + fromNode.text + 'Result>{\n' +
+                    '@Override\n' +
+                    'public StageActionResult<' + fromNode.text + 'Result> execute(GeneratedProcess process) {\n' +
+                    '          return StageActionResult.success(' + fromNode.text + 'Result.RESULT_0,ProcessContextModifier.UpdateContext.YES);\n' +
+                    '}\n' +
+                    '}\n\n';
             }
 
         }
