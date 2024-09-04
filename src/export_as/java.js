@@ -7,8 +7,78 @@ function ExportAsJava() {
 
     this.toJava = function () {
 
+        var posponedNodes = [];
+        var objLinks = [];
+
+        let nodeOutLinks = new Map();
+        let nodeInLinks = new Map();
+        //init with empty arrays for simplier logic further
+        for (let i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            nodeOutLinks.set(node.nodeId, []);
+            nodeInLinks.set(node.nodeId, []);
+        }
+
+        for (let i = 0; i < links.length; i++) {
+            const storedLink = links[i];
+            let link = null;
+
+            if (storedLink.nodeA == null && storedLink.nodeB == null) {
+                posponedNodes.push(storedLink.node.nodeId);
+            } else if (storedLink.nodeA.nodeId !== storedLink.nodeB.nodeId) {
+                let linkNodeA = null
+                let linkNodeB = null
+                for (let j = 0; j < nodes.length; j++) {
+                    if (nodes[j].nodeId === storedLink.nodeA.nodeId) {
+                        linkNodeA = nodes[j];
+                        break;
+                    }
+                }
+                for (let j = 0; j < nodes.length; j++) {
+                    if (nodes[j].nodeId === storedLink.nodeB.nodeId) {
+                        linkNodeB = nodes[j];
+                        break;
+                    }
+                }
+
+                link = new Link(linkNodeA, linkNodeB);
+                link.text = storedLink.text;
+                objLinks.push(link);
+
+                var outLinks = nodeOutLinks.get(storedLink.nodeA.nodeId);
+                    outLinks.push(storedLink);
+                    nodeOutLinks.set(storedLink.nodeA.nodeId, outLinks);
+
+                var inLinks = nodeInLinks.get(storedLink.nodeB.nodeId);
+                    inLinks.push(storedLink);
+                    nodeInLinks.set(storedLink.nodeB.nodeId, inLinks);
+            }
+
+        }
+
         var initNodeIndex = 0;
         var successNodeIndex = 0;
+
+        //now find first node. ==0 in and >0 out links;
+        for (let i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if ((nodeInLinks.get(node.nodeId).length==0) &&
+                (nodeOutLinks.get(node.nodeId).length>0)) {
+                initNodeIndex = i;
+                break;
+            }
+        }
+
+
+       //now find some last node. >0 in and ==0 out links;
+        for (let i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if ((nodeInLinks.get(node.nodeId).length>=0) &&
+                (nodeOutLinks.get(node.nodeId).length==0)) {
+                successNodeIndex = i;
+                break;
+            }
+        }
 
         var statesString = ' ';
         for (let i = 0; i < nodes.length; i++) {
