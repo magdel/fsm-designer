@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>FSM Generator</title>
+    <title>FSM Ninja</title>
     <meta charset="utf-8">
 
     <meta name="google-site-verification" content="i0vmn4IP7f-3iowQql-H9hjpWkS_FjvrXaKsN3mG5Gw"/>
@@ -115,10 +115,13 @@
 
 <nav class="navbar border-bottom border-body px-4 shadow-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"></a>
+        <a class="navbar-brand" href="#">DEVELOPED WITH LOVE ❤</a>
         <a class="navbar-brand fw-bolder text-secondary" href="#">Finite System Machine Designer</a>
 
         <div>
+            <!--            add star me-->
+            <a class="btn btn-light border-secondary" href="https://github.com/Arash1381-y/fsmNinja.git" target="_blank"
+               role="button">Support Me</a>
             <a class="btn btn-dark" href="index-dark.html" role="button">Dark Mode</a>
         </div>
     </div>
@@ -138,6 +141,20 @@
 
 
     <div class="card-group">
+        <div id="json-container" class="btn text-center card  bg-danger rounded card-upload border-0">
+            <div class="card-body">
+                <input id="json-upload" style="display: none" type="file">
+
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white">Upload your JSON</p>
+            </div>
+        </div>
+        <div class="card btn text-center bg-warning rounded card-download border-0" onclick="saveAsLaTeX();">
+            <div class="card-body">
+                <h1 class="card-title text-white">LATEX</h1>
+                <p class="h-3 text-white"> Copy to Clipboard</p>
+            </div>
+        </div>
         <div class="card btn text-center bg-warning rounded card-download border-0" onclick="saveAsJava();">
             <div class="card-body">
                 <h1 class="card-title text-white">Java</h1>
@@ -148,6 +165,12 @@
             <div class="card-body">
                 <h1 class="card-title text-white">PNG</h1>
                 <p class="h-3 text-white "> Copy to Clipboard</p>
+            </div>
+        </div>
+        <div class="card btn text-center bg-success rounded card-download border-0" onclick="saveAsJson();">
+            <div class="card-body">
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white"> Copy to Clipboard</p>
             </div>
         </div>
     </div>
@@ -381,4 +404,7 @@
 
 </body>
 
+<footer class="blockquote-footer align-self-center text-center">
+    Created By Arash and Evan
+</footer>
 </html>
