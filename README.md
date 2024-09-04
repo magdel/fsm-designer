@@ -4,7 +4,12 @@
 
 Checkout the website!
 
-## Usage
+## How to build
 
 To build app use _python build.py_
 This creates fsm.js to run main app.
+
+## Usage
+
+Use www folder as web root. Draw your FSM and export it to Java. 
+That's all.
