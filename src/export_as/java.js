@@ -6,6 +6,21 @@ function ExportAsJava() {
     this.strokeStyle = "black";
 
     this.toJava = function () {
+
+        var initNodeIndex = 0;
+        var successNodeIndex = 0;
+
+        var statesString = ' ';
+        for (let i = 0; i < nodes.length; i++) {
+            statesString = statesString + 'STATE_'+nodes[i].text + '('+(i+1)+','+
+                (i==successNodeIndex ? 'SUCCESS': 'ROLL')
+                +')'+
+                (i==nodes.length-1 ? ';': ',')
+                +'\n';
+        }
+
+        initStateName = 'STATE_'+nodes[initNodeIndex].text;
+
         return 'import com.fasterxml.jackson.annotation.JsonCreator;\n' +
             'import com.fasterxml.jackson.annotation.JsonProperty;\n' +
             'import com.fasterxml.jackson.annotation.JsonValue;\n' +
@@ -60,11 +75,7 @@ function ExportAsJava() {
             '    }\n' +
             '\n' +
             '    enum State implements ProcessStage {\n' +
-            '        INITIAL(0, ROLL),\n' +
-            '        STATE_A(1, ROLL),\n' +
-            '        STATE_B(2, ROLL),\n' +
-            '        FINISHED(3, SUCCESS);\n' +
-            '\n' +
+            ' ' + statesString +
             '\n' +
             '        private final Integer code;\n' +
             '        private final ContinueState continueState;\n' +
@@ -184,7 +195,7 @@ function ExportAsJava() {
             '        private String someId;\n' +
             '\n' +
             '        GeneratedProcessContext() {\n' +
-            '            super(State.INITIAL);\n' +
+            '            super(State.'+initStateName+');\n' +
             '        }\n' +
             '\n' +
             '        @Override\n' +
@@ -269,12 +280,7 @@ function ExportAsJava() {
         '            return code;\n' +
         '        }\n' +
         '    }\n' +
-        '}' +
-            this._texData +
-            '\\end{tikzpicture}\n' +
-            '\\end{center}\n' +
-            '\n' +
-            '\\end{document}\n';
+        '}';
     };
 
     this.beginPath = function () {
