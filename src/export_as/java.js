@@ -1,10 +1,17 @@
+getNodeById = function(id) {
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].nodeId === id)
+            return nodes[i];
+    }
+    return null;
+}
+
 // draw using this instead of a canvas and call toJava() afterward
 function ExportAsJava() {
     this._points = [];
     this._texData = '';
     this._scale = 0.1; // to convert pixels to document space (TikZ breaks if the numbers get too big, above 500?)
     this.strokeStyle = "black";
-
     this.toJava = function () {
 
         var posponedNodes = [];
@@ -57,8 +64,6 @@ function ExportAsJava() {
         }
 
         var initNodeIndex = 0;
-        var successNodeIndex = 0;
-
         //now find first node. ==0 in and >0 out links;
         for (let i = 0; i < nodes.length; i++) {
             var node = nodes[i];
@@ -69,8 +74,9 @@ function ExportAsJava() {
             }
         }
 
+        var successNodeIndex = 0;
 
-       //now find some last node. >0 in and ==0 out links;
+        //now find some last node. >0 in and ==0 out links;
         for (let i = 0; i < nodes.length; i++) {
             var node = nodes[i];
             if ((nodeInLinks.get(node.nodeId).length>=0) &&
@@ -89,7 +95,33 @@ function ExportAsJava() {
                 +'\n';
         }
 
-        initStateName = 'STATE_'+nodes[initNodeIndex].text;
+        var initStateName = 'STATE_'+nodes[initNodeIndex].text;
+        var finalStateName = 'STATE_'+nodes[successNodeIndex].text;
+
+        //generate fsm build
+        var fsmBuild = '';
+        var fsmActions = '';
+
+        for (let i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (nodeOutLinks.get(node.nodeId).length == 1) {
+                var link = nodeOutLinks.get(node.nodeId)[0];
+                var fromNode = getNodeById(link.nodeA.nodeId);
+                var toNode = getNodeById(link.nodeB.nodeId);
+                fsmBuild = fsmBuild + '.stage(State.STATE_' + fromNode.text + ', ' +
+                    'new ' + fromNode.text + 'Action()).nextStage(State.STATE_' + toNode.text + ')\n';
+
+                fsmActions = fsmActions +
+                    '    static class '+fromNode.text+'Action implements StageAction<GeneratedProcess, VoidEnum>{\n' +
+                    '@Override\n' +
+                    'public StageActionResult<VoidEnum> execute(GeneratedProcess process) {\n' +
+                    '          return StageActionResult.success(ProcessContextModifier.UpdateContext.YES);\n' +
+                    '}\n' +
+                    '}\n\n';
+            }
+
+        }
+
 
         return 'import com.fasterxml.jackson.annotation.JsonCreator;\n' +
             'import com.fasterxml.jackson.annotation.JsonProperty;\n' +
@@ -99,7 +131,10 @@ function ExportAsJava() {
             'import ru.yandex.money.domain.unilabel.UniLabel;\n' +
             'import ru.yandex.money.fsm.context.*;\n' +
             'import ru.yandex.money.fsm.dao.ProcessCreateData;\n' +
+            'import ru.yandex.money.fsm.machine.StageAction;\n' +
+            'import ru.yandex.money.fsm.machine.StageActionResult;\n' +
             'import ru.yandex.money.fsm.machine.StateMachine;\n' +
+            'import ru.yandex.money.fsm.machine.VoidEnum;\n' +
             'import ru.yandex.money.fsm.machine.graph.GraphPrinter;\n' +
             'import ru.yandex.money.fsm.monitoring.ProcessContextModifier;\n' +
             'import ru.yandex.money.fsm.process.Process;\n' +
@@ -122,10 +157,11 @@ function ExportAsJava() {
             '    public GeneratedProcessExecutor(\n' +
             '            @Nonnull ProcessContextModifier<GeneratedProcess> contextModifier) {\n' +
             '        this.stateMachine = StateMachine.builder(State.class, contextModifier)\n' +
-            '                .noAction(State.INITIAL, State.STATE_A, State.STATE_B, State.FINISHED)\n' +
-            '                .finalStage(State.FINISHED)\n' +
+            '           ' + fsmBuild +
+            '                .finalStage(State.'+finalStateName+')\n' +
             '                .build();\n' +
             '    }\n' +
+            '\n' + fsmActions +
             '\n' +
             '    @Nonnull\n' +
             '    @Override\n' +
