@@ -217,7 +217,6 @@
 
 <nav class="navbar border-bottom border-body px-4 shadow-lg">
     <div class="container-fluid">
-        <a class="navbar-brand text-light" href="#"></a>
         <a class="navbar-brand fw-bolder text-secondary" href="#">Finite System Machine Designer</a>
 
         <div>
@@ -252,11 +251,19 @@
                 <p class="h-3 text-white "> Copy to Clipboard</p>
             </div>
         </div>
-        <div class="card-body">
-            <input id="json-upload" style="display: none" type="file">
+        <div id="json-container" class="btn text-center card  bg-danger rounded card-upload border-0">
+            <div class="card-body">
+                <input id="json-upload" style="display: none" type="file">
 
-            <h1 class="card-title text-white">JSON</h1>
-            <p class="h-3 text-white">Upload your JSON</p>
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white">Upload your JSON</p>
+            </div>
+        </div>
+        <div class="card btn text-center bg-success rounded card-download border-0" onclick="saveAsJson();">
+            <div class="card-body">
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white"> Copy to Clipboard</p>
+            </div>
         </div>
     </div>
 </div>
