@@ -155,28 +155,12 @@ function ExportAsJava() {
             'import com.fasterxml.jackson.annotation.JsonProperty;\n' +
             'import com.fasterxml.jackson.annotation.JsonValue;\n' +
             'import jakarta.annotation.Nonnull;\n' +
-            'import ru.yandex.money.common.json.JsonObject;\n' +
-            'import ru.yandex.money.domain.unilabel.UniLabel;\n' +
-            'import ru.yandex.money.fsm.context.*;\n' +
-            'import ru.yandex.money.fsm.dao.ProcessCreateData;\n' +
-            'import ru.yandex.money.fsm.machine.StageAction;\n' +
-            'import ru.yandex.money.fsm.machine.StageActionResult;\n' +
-            'import ru.yandex.money.fsm.machine.StateMachine;\n' +
-            'import ru.yandex.money.fsm.machine.VoidEnum;\n' +
-            'import ru.yandex.money.fsm.machine.graph.GraphPrinter;\n' +
-            'import ru.yandex.money.fsm.monitoring.ProcessContextModifier;\n' +
-            'import ru.yandex.money.fsm.process.Process;\n' +
-            'import ru.yandex.money.fsm.process.ProcessExecutor;\n' +
-            'import ru.yandex.money.fsm.process.ProcessType;\n' +
-            'import ru.yandex.money.fsm.queue.ContinueState;\n' +
             '\n' +
             'import java.util.Objects;\n' +
             'import java.util.Optional;\n' +
             'import java.util.UUID;\n' +
             '\n' +
             'import static java.util.Objects.requireNonNull;\n' +
-            'import static ru.yandex.money.fsm.queue.ContinueState.ROLL;\n' +
-            'import static ru.yandex.money.fsm.queue.ContinueState.SUCCESS;\n' +
             '\n' +
             'public class GeneratedProcessExecutor implements\n' +
             '        ProcessExecutor<GeneratedProcessExecutor.GeneratedProcess, GeneratedProcessExecutor.GeneratedProcessId> {\n' +
